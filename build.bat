@@ -1,0 +1,1 @@
+g++ -o winapidows.exe main.cpp -lgdiplus -lgdi32 -Wall -Wextra
