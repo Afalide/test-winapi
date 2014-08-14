@@ -1,4 +1,4 @@
-
+﻿
 #include <iostream>
 #include <windows.h>
 //#include <wingdi.h>
@@ -26,9 +26,10 @@ LRESULT CALLBACK MyWindowProc(
 		case WM_PAINT:
 			std::cout << "WM_PAINT\n";
 			PAINTSTRUCT ps; 
-			HDC hdc; 
-			hdc = BeginPaint(hWnd, &ps);
-			TextOut(hdc, 0, 0, "Hello, Windows!", 15); 
+			// HDC hdc; 
+			// hdc = BeginPaint(hWnd, &ps);
+			// TextOut(hdc, 0, 0, "Hello, Windows!", 15); 
+			BeginPaint(hWnd, &ps);
 			EndPaint(hWnd, &ps);
 			return 0;
 			
@@ -94,7 +95,16 @@ int main()
 	}
 	
 	//Remove every style (borders, titlebar...)
-	// SetWindowLong(window, GWL_STYLE, WS_POPUP);
+	SetWindowLong(window, GWL_STYLE,   0);
+	SetWindowLong(window, GWL_EXSTYLE, 0);
+	
+	//Add basic window decoration
+	SetWindowLong(window, GWL_STYLE,
+		WS_CAPTION     // title bar + borders
+	   |WS_SYSMENU     // icon X (close window, requires CAPTION)
+	   |WS_MAXIMIZEBOX // icon □ (maximize window, requires SYSMENU)
+	   |WS_MINIMIZEBOX // icon _ (minimize window, requires SYSMENU)
+	);
 	
 	//Show the created window
 	ShowWindow(window, SW_SHOW);
