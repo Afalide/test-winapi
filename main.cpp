@@ -1,8 +1,13 @@
 ﻿
 #include <iostream>
 #include <windows.h>
-//#include <wingdi.h>
-#include <gdiplus.h>
+#include <wingdi.h>
+#include <windowsx.h>
+// #include <gdiplus.h>
+
+//Some globals
+COLORREF 	g_bg_color = RGB(68,150,101);
+HBRUSH		g_bg_brush = CreateSolidBrush(g_bg_color);
 
 //The window procedure. It is a function designed to process window events (=messages).
 //It will be called each time the window recieves an event
@@ -22,14 +27,23 @@ LRESULT CALLBACK MyWindowProc(
 		case WM_NCCREATE:
 			std::cout << "WM_NCCREATE\n";
 			return 1;
+			
+		case WM_LBUTTONDOWN:
+			std::cout << "WM_LBUTTONDOWN";
+			int x,y;
+			x = GET_X_LPARAM(lParam); 
+			y = GET_Y_LPARAM(lParam); 
+			return 0;
 		
 		case WM_PAINT:
 			std::cout << "WM_PAINT\n";
 			PAINTSTRUCT ps; 
-			// HDC hdc; 
-			// hdc = BeginPaint(hWnd, &ps);
-			// TextOut(hdc, 0, 0, "Hello, Windows!", 15); 
-			BeginPaint(hWnd, &ps);
+			HDC hdc; 
+			hdc = BeginPaint(hWnd, &ps);
+			
+			//TextOut(hdc, 0, 0, "Hello, Windows!", 15);
+			Rectangle(hdc, 10, 10, 30, 30);
+			
 			EndPaint(hWnd, &ps);
 			return 0;
 			
@@ -61,7 +75,7 @@ int main()
 	winClass.hInstance  	= NULL;
 	winClass.hIcon			= NULL;
 	winClass.hCursor		= NULL;
-	winClass.hbrBackground	= WHITE_BRUSH;
+	winClass.hbrBackground	= g_bg_brush;
 	winClass.lpszMenuName	= NULL;
 	winClass.lpszClassName	= "MyClass";
 	
@@ -111,32 +125,34 @@ int main()
     UpdateWindow(window);
 
 	//Prepare the GDI+ API
-	Gdiplus::GdiplusStartupInput 	gdiStartupInput;
-	Gdiplus::GdiplusStartupOutput	gdiStartupOuput;
-	ULONG_PTR                    	gdiToken;
+	// Gdiplus::GdiplusStartupInput 	gdiStartupInput;
+	// Gdiplus::GdiplusStartupOutput	gdiStartupOuput;
+	// ULONG_PTR                    	gdiToken;
 	
 	//Start the GDI+ API
-	gdiStartupInput.SuppressBackgroundThread = true;
-	Gdiplus::GdiplusStartup(&gdiToken, &gdiStartupInput, &gdiStartupOuput);
+	// gdiStartupInput.SuppressBackgroundThread = true;
+	// Gdiplus::GdiplusStartup(&gdiToken, &gdiStartupInput, &gdiStartupOuput);
 	
 	//Get the hook procedures. We are responsible to call them
 	//before and after the main loop
-	ULONG_PTR 							hookProcToken;
-	Gdiplus::NotificationHookProc	 	notificationHookProc;
-	Gdiplus::NotificationUnhookProc 	notificationUnhookProc;
-	notificationHookProc =   gdiStartupOuput.NotificationHook;
-	notificationUnhookProc = gdiStartupOuput.NotificationUnhook;
+	//This is to avoid a background thread created by the system
+	// ULONG_PTR 							hookProcToken;
+	// Gdiplus::NotificationHookProc	 	notificationHookProc;
+	
+	// Gdiplus::NotificationUnhookProc 	notificationUnhookProc;
+	// notificationHookProc   = gdiStartupOuput.NotificationHook;
+	// notificationUnhookProc = gdiStartupOuput.NotificationUnhook;
 	
 	//Basic event loop
-    notificationHookProc(&hookProcToken);
+    // notificationHookProc(&hookProcToken);
 	MSG msg;
     while (GetMessage (&msg, NULL, 0, 0))
     {
-        TranslateMessage (&msg); //Reads keyboard messages
-        DispatchMessage (&msg);  //Sends mesg to the appropriate window
+        TranslateMessage (&msg);  //Reads keyboard messages
+        DispatchMessage  (&msg);  //Sends msg to the appropriate window
     }
-	notificationUnhookProc(hookProcToken);
-	Gdiplus::GdiplusShutdown(gdiToken);
+	// notificationUnhookProc(hookProcToken);
+	// Gdiplus::GdiplusShutdown(gdiToken);
 	
 	std::cout << "End\n";
 	return 0;
