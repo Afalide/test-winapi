@@ -10,6 +10,7 @@ COLORREF 	g_bg_color = RGB(68,150,101);
 HBRUSH		g_bg_brush = CreateSolidBrush(g_bg_color);
 HWND		g_window;
 WNDCLASS 	g_windowClass;
+HCURSOR		g_hand_cursor = LoadCursor(NULL, IDC_HAND);
 	
 //The window procedure. It is a function designed to process window events (=messages).
 //It will be called each time the window recieves an event
@@ -22,51 +23,63 @@ LRESULT CALLBACK MyWindowProc(
     WPARAM wParam,    // first message parameter
     LPARAM lParam)    // second message parameter
 {
-	// std::cout << "Got an event: ";
 	
-	switch(uMsg)
+	if(WM_SETCURSOR == uMsg)
 	{
-		PAINTSTRUCT ps; 
-		HDC hdc; 
-	
-		case WM_NCCREATE:
-			std::cout << "WM_NCCREATE\n";
-			return 1;
-			
-		case WM_LBUTTONDOWN:
-			std::cout << "WM_LBUTTONDOWN ";
-			int x,y;
-			x = GET_X_LPARAM(lParam); 
-			y = GET_Y_LPARAM(lParam); 
-			std::cout << "at " << x << " " << y << "\n";
-			
-			if (false == SetWindowPos(g_window,HWND_TOP,100,100,200,200,SWP_DRAWFRAME))
-				std::cout << "SetWindowPos() failed with code " << GetLastError() << "\n";
-			
-			return 0;
-		
-		case WM_PAINT:
-			std::cout << "WM_PAINT\n";
-			hdc = BeginPaint(hWnd, &ps);
-			//TextOut(hdc, 0, 0, "Hello, Windows!", 15);
-			Rectangle(hdc, 10, 10, 30, 30);
-			
-			EndPaint(hWnd, &ps);
-			return 0;
-			
-		case WM_DESTROY:
-			std::cout << "WM_DESTROY\n"; 
-			PostQuitMessage(0);
-			return 0;
-			
-		default:
-			//We call the default window procedure
-			// std::cout << "other\n";
-			return DefWindowProc(hWnd, uMsg, wParam, lParam);
+		// Sleep(1000);
+		std::cout << "|";
+		SetCursor(g_hand_cursor);
+		return TRUE;
+		// std::cout << "Cursor changed\n";
 	}
 	
-	std::cout << "This part should not be called\n";
-	return 0;
+	return DefWindowProc(hWnd, uMsg, wParam, lParam);
+
+	// std::cout << "Got an event: ";
+	
+	// switch(uMsg)
+	// {
+		// PAINTSTRUCT ps; 
+		// HDC hdc; 
+	
+		// case WM_NCCREATE:
+			// std::cout << "WM_NCCREATE\n";
+			// return 1;
+			
+		// case WM_LBUTTONDOWN:
+			// std::cout << "WM_LBUTTONDOWN ";
+			// int x,y;
+			// x = GET_X_LPARAM(lParam); 
+			// y = GET_Y_LPARAM(lParam); 
+			// std::cout << "at " << x << " " << y << "\n";
+			
+			// if (false == SetWindowPos(g_window,HWND_TOP,100,100,200,200,SWP_DRAWFRAME))
+				// std::cout << "SetWindowPos() failed with code " << GetLastError() << "\n";
+			
+			// return 0;
+		
+		// case WM_PAINT:
+			// std::cout << "WM_PAINT\n";
+			// hdc = BeginPaint(hWnd, &ps);
+			// //TextOut(hdc, 0, 0, "Hello, Windows!", 15);
+			// Rectangle(hdc, 10, 10, 30, 30);
+			
+			// EndPaint(hWnd, &ps);
+			// return 0;
+			
+		// case WM_DESTROY:
+			// std::cout << "WM_DESTROY\n"; 
+			// PostQuitMessage(0);
+			// return 0;
+			
+		// default:
+			// //We call the default window procedure
+			// // std::cout << "other\n";
+			// return DefWindowProc(hWnd, uMsg, wParam, lParam);
+	// }
+	
+	// std::cout << "This part should not be called\n";
+	// return 0;
 }
 
 
@@ -128,7 +141,7 @@ int main()
 		// ,NULL
 	// );
 	
-	g_window = CreateWindowW(className, L"MyWindowTitle", WS_VISIBLE|WS_POPUP, 100, 100, 300, 300, NULL, NULL, NULL, NULL);
+	g_window = CreateWindowW(className, L"MyWindowTitle", WS_VISIBLE|WS_POPUP, 100, 100, 300, 300, NULL, NULL, GetModuleHandle(NULL), NULL);
 	
 	if(NULL == g_window)
 	{
@@ -139,11 +152,8 @@ int main()
 	
 	/////////////////////////////////////////////////////////////////
 	// Styles modification
-	
-	HRGN hrgn = CreateRectRgn(0, 0, 200, 300);
-	SetWindowRgn(g_window, hrgn, TRUE);
-	SetActiveWindow(g_window);
-	EnableWindow(g_window,true);
+
+    SetWindowPos(g_window, NULL, 0, 0, 300, 300, SWP_NOMOVE | SWP_NOZORDER);
 	ShowWindow(g_window, SW_SHOW);
     UpdateWindow(g_window);
 	
