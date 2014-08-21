@@ -71,11 +71,7 @@ int main()
 	SetWindowLong(g_window, GWL_STYLE, WS_CAPTION|WS_SYSMENU);
 	
 	ShowWindow(g_window, SW_SHOW);
-	// UpdateWindow(g_window);
-	
-	// HDC main_window_dc = CreateCompatibleDC(NULL);
-	// if(0 == UpdateLayeredWindow(g_window, NULL, NULL, NULL, main_window_dc, NULL, g_bg_color, NULL, 0))
-		// std::cout << "UpdateLayeredWindow failed with code " << GetLastError() << "\n";
+	UpdateWindow(g_window);
 	
 	MSG msg;
     while (GetMessage (&msg, NULL, 0, 0))
@@ -107,14 +103,23 @@ LRESULT CALLBACK MyWindowProc(HWND window, UINT message, WPARAM wparam, LPARAM l
 			y = GET_Y_LPARAM(lparam); 
 			std::cout << "WM_LBUTTONDOWN at " << x << " " << y << "\n";
 			
-			// hdc = GetDC(g_window);
-			// hdc = GetDCEx(g_window,NULL,DCX_WINDOW);
-			hdc = GetWindowDC(g_window);
+			// hdc = GetWindowDC(g_window);
+			hdc = GetDC(g_window);
 			if(NULL == hdc)
 				std::cout << "GetWindowDC failed with code " << GetLastError() << "\n"; 
 			
-			if(0 == Rectangle(hdc, x-10, y-10, x, y))
-				std::cout << "Rectangle failed with code " << GetLastError() << "\n"; 
+			// if(0 == Rectangle(hdc, x-10, y-10, x, y))
+				// std::cout << "Rectangle failed with code " << GetLastError() << "\n";
+				
+			// HBITMAP bmp = CreateCompatibleBitmap(hdc,50,50);
+			
+			COLORREF gray;
+			gray = RGB(200,200,200);
+			
+			SetPixel(hdc,5,5,gray);
+			SetPixel(hdc,6,5,gray);
+			SetPixel(hdc,5,6,gray);
+			SetPixel(hdc,6,6,gray);
 				
 			ReleaseDC(g_window,hdc);
 			
