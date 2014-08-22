@@ -6,6 +6,11 @@
 
 
 //////////////////////////////////////////////////
+// typedef byte unsigned
+
+
+
+//////////////////////////////////////////////////
 LRESULT CALLBACK MyWindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 
@@ -23,6 +28,7 @@ int			g_ypos;
 //////////////////////////////////////////////////
 int main()
 {
+	
 	g_bg_color = RGB(30,30,30)/*RGB(68,150,101)*/;
 	g_bg_brush = CreateSolidBrush(g_bg_color);
 	g_hand_cursor = LoadCursor(NULL, IDC_HAND);
@@ -103,8 +109,8 @@ LRESULT CALLBACK MyWindowProc(HWND window, UINT message, WPARAM wparam, LPARAM l
 			y = GET_Y_LPARAM(lparam); 
 			std::cout << "WM_LBUTTONDOWN at " << x << " " << y << "\n";
 			
-			// hdc = GetWindowDC(g_window);
-			hdc = GetDC(g_window);
+			// hdc = GetWindowDC(g_window); //Get the full area (client area + title bar + borders)
+			hdc = GetDC(g_window);          //Get the client area only
 			if(NULL == hdc)
 				std::cout << "GetWindowDC failed with code " << GetLastError() << "\n"; 
 			
@@ -116,20 +122,29 @@ LRESULT CALLBACK MyWindowProc(HWND window, UINT message, WPARAM wparam, LPARAM l
 			COLORREF gray;
 			gray = RGB(200,200,200);
 			
-			SetPixel(hdc,5,5,gray);
-			SetPixel(hdc,6,5,gray);
-			SetPixel(hdc,5,6,gray);
-			SetPixel(hdc,6,6,gray);
+			SetPixel(hdc,x-5,y-5,gray);
+			SetPixel(hdc,x-6,y-5,gray);
+			SetPixel(hdc,x-5,y-6,gray);
+			SetPixel(hdc,x-6,y-6,gray);
 				
 			ReleaseDC(g_window,hdc);
+			
 			
 			break;
 		
 		case WM_PAINT:
 			std::cout << "WM_PAINT\n";
+			
+			//To repaint the full white rectangle
+			// hdc = GetDC(g_window);
+			// Rectangle(hdc, 10, 10, 30, 30);
+			// ValidateRgn(g_window, NULL);
+			
+			//To repaint only parts of the white rectangle
 			hdc = BeginPaint(window, &ps);
 			Rectangle(hdc, 10, 10, 30, 30);
 			EndPaint(window, &ps);
+			
 			break;
 			
 		case WM_DESTROY:
